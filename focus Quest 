@@ -1,0 +1,6 @@
+git init
+git add .
+git commit -m "Initial FocusQuest Ocean prototype"
+git branch -M main
+git remote add origin https://github.com/<yourusername>/focusquest-ocean.git
+git push -u origin main
