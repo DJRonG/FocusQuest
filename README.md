@@ -1,2 +1,4 @@
 # FocusQuest
 FocusQuest
+
+git init
