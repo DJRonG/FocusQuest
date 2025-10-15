@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusQuest 🌊</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌊 FocusQuest</h1>
+      <p>Track your creativity, focus, and daily balance</p>
+    </header>
+
+    <main>
+      <section class="journal">
+        <h2>📝 Journal</h2>
+        <textarea placeholder="Write your thoughts or reflections here..."></textarea>
+      </section>
+
+      <section class="email">
+        <h2>📧 Daily Email Summary</h2>
+        <textarea placeholder="Draft your key email notes or updates..."></textarea>
+      </section>
+
+      <section class="activities">
+        <h2>🏃 Daily Activities</h2>
+        <ul id="activityList"></ul>
+        <input id="newActivity" placeholder="Add a new activity..." />
+        <button onclick="addActivity()">Add</button>
+      </section>
+
+      <section class="score">
+        <h2>💪 Productivity Score: <span id="scoreValue">0</span></h2>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
