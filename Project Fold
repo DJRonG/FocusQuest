@@ -1,3 +1,0 @@
-pkg install git
-git clone https://github.com/DJRonG/FocusQuest.git
-cd FocusQuest
