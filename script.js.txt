@@ -1,44 +1,17 @@
-/* ==========================
-   FOCUSQUEST - INTERACTIVITY
-   ========================== */
-
-// Keep track of activities and score
 let score = 0;
-const scoreDisplay = document.getElementById("scoreValue");
-const activityList = document.getElementById("activityList");
-const newActivityInput = document.getElementById("newActivity");
 
-// Add new activity + update score
 function addActivity() {
-  const activityText = newActivityInput.value.trim();
+  const input = document.getElementById("newActivity");
+  const activity = input.value.trim();
+  if (activity) {
+    const list = document.getElementById("activityList");
+    const item = document.createElement("li");
+    item.textContent = activity;
+    list.appendChild(item);
 
-  if (activityText !== "") {
-    const listItem = document.createElement("li");
-    listItem.textContent = activityText;
-    activityList.appendChild(listItem);
+    score += 1;
+    document.getElementById("scoreValue").textContent = score;
 
-    // Basic scoring logic
-    // Each activity adds +10 points
-    score += 10;
-    scoreDisplay.textContent = score;
-
-    // Optional: encourage message
-    if (score % 50 === 0) {
-      alert("🔥 Great job! You’ve reached a new focus level!");
-    }
-
-    newActivityInput.value = "";
+    input.value = "";
   }
 }
-
-// Optional: Keyboard shortcut (Enter key)
-newActivityInput.addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    addActivity();
-  }
-});
-
-// Future additions (placeholder)
-// - Track water intake
-// - Add journaling save function
-// - Sync with calendar for focus reminders
