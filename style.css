@@ -1,0 +1,29 @@
+/* 🌊 FocusQuest Theme - Ocean meets Ancient Gold */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #00264d, #006699);
+  color: #f5deb3;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+  text-align: center;
+  color: #ffcc33;
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+header p {
+  text-align: center;
+ 
