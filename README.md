@@ -1,43 +1,14 @@
-# 🌊 FocusQuest
+# FocusQuest
 
-**FocusQuest** is a personal productivity and journaling web app that helps you stay focused, creative, and inspired during your workday.
+FocusQuest is an adaptive learning & focus webapp powered by a Weekend-Agent core. This repo contains a starter scaffold for the frontend (Next.js), backend (FastAPI), agent modules, and deployment templates for Google AI Studio (Vertex AI), Firebase Hosting, and Cloud Build.
 
-It’s designed with a **blue and gold** theme inspired by **ancient Greek and Egyptian aesthetics**, balanced with **Zen water elements** (ocean and waterfalls) for calm and mindfulness.
+## Quick start
 
----
+1. Clone repo
+2. Copy `.env.example` to `.env` and fill values
+3. From `apps/backend`: `python -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+4. Start backend: `uvicorn main:app --reload --port 8000`
+5. From `apps/web`: `npm install && npm run dev`
 
-## 🚀 Features
-
-- 📝 **Daily Journal** – Write freely and reflect at the start or end of your day.
-- 📧 **Daily Email Notes** – Capture your work communications or reminders.
-- 🧘‍♂️ **Activity Tracker** – Log daily tasks (like workouts, walks, or breaks).
-- 🌞 **Productivity Score** – Earn points for healthy, focused habits.
-- 💧 **Happiness Score** – See your overall well-being grow as you stay consistent.
-- 🔔 **Reminders** – Gentle notifications for breaks, writing, or hydration.
-
----
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React + TailwindCSS  
-- **Hosting**: Vercel (auto-deploys from GitHub)  
-- **Version Control**: Git + GitHub  
-
----
-
-## 📦 Setup (For Developers)
-
-To run locally:
-
-```bash
-# 1. Clone this repository
-git clone https://github.com/DJRonG/FocusQuest.git
-
-# 2. Enter the folder
-cd FocusQuest
-
-# 3. Install dependencies
-npm install
-
-# 4. Run the development server
-npm run dev
+## Deploy
+Follow the `deploy` section and use the provided `focusquest_deploy.yaml`, `firebase.json`, and `cloudbuild.yaml` to deploy to Vertex AI + Firebase.
