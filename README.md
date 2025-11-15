@@ -1,14 +1,29 @@
 # FocusQuest
 
-FocusQuest is an adaptive learning & focus webapp powered by a Weekend-Agent core. This repo contains a starter scaffold for the frontend (Next.js), backend (FastAPI), agent modules, and deployment templates for Google AI Studio (Vertex AI), Firebase Hosting, and Cloud Build.
+FocusQuest — Adaptive learning & focus webapp powered by a Weekend-Agent core.
 
-## Quick start
+This repository contains the scaffold and automation to run locally, CI, and deploy to Google Cloud (Cloud Run / Vertex AI) and Firebase Hosting.
 
-1. Clone repo
-2. Copy `.env.example` to `.env` and fill values
-3. From `apps/backend`: `python -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
-4. Start backend: `uvicorn main:app --reload --port 8000`
-5. From `apps/web`: `npm install && npm run dev`
+---
 
-## Deploy
-Follow the `deploy` section and use the provided `focusquest_deploy.yaml`, `firebase.json`, and `cloudbuild.yaml` to deploy to Vertex AI + Firebase.
+## Quick status (Linear-style)
+
+### New
+- Repo scaffold with frontend (Next.js), backend (FastAPI), agent modules, and deploy templates.
+
+### Improved
+- GitHub Actions for CI / CD.
+- Deployment instructions for Cloud Run and Firebase.
+
+### Upcoming
+- Full production memory (Firestore) integration.
+- Autonomous features (task watcher, learning engine).
+
+---
+
+## Local quick-start
+
+1. Clone repo:
+```bash
+git clone https://github.com/DJRonG/FocusQuest.git
+cd FocusQuest
