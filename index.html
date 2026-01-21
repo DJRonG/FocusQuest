@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FocusQuest 🌊</title>
-  style.css
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="container">
   <header>
@@ -25,7 +25,9 @@
 
     <section class="activities">
       <h2>🏃 Daily Activities</h2>
-      <ul id="activity onclick="addActivity()">Add</button>
+      <input type="text" id="newActivity" placeholder="Add a new activity..." />
+      <button onclick="addActivity()">Add</button>
+      <ul id="activityList"></ul>
     </section>
 
     <section class="score">
@@ -33,6 +35,6 @@
     </section>
   </main>
 
-  script.js</script>
+  <script src="script.js"></script>
 </body>
 </html>
