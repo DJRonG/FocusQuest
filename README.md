@@ -21,6 +21,12 @@ This repository contains the scaffold and automation to run locally, CI, and dep
 
 ---
 
+## Documentation
+
+- **[Platform Updates](docs/PLATFORM_UPDATES.md)** - Comprehensive overview of the AI Copilot layer, QR Contact Agent architecture, and reference implementations
+
+---
+
 ## Local quick-start
 
 1. Clone repo:

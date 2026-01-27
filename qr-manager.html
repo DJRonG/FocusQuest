@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Manager - FocusQuest 🌊</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="qr-manager.css" />
+</head>
+<body class="container">
+  <header>
+    <h1>🌊 FocusQuest - QR Manager</h1>
+    <p>Dynamic QR codes with journey intelligence</p>
+    <nav style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="index.html">🏠 Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- QR Creation Section -->
+    <section class="qr-creator">
+      <h2>Create New QR Code</h2>
+      <form id="createQRForm">
+        <div class="form-group">
+          <label for="campaignName">Campaign Name:</label>
+          <input type="text" id="campaignName" placeholder="My Campaign" required />
+        </div>
+
+        <div class="form-group">
+          <label for="journeyState">Journey State:</label>
+          <select id="journeyState" required>
+            <option value="lead_capture">Lead Capture</option>
+            <option value="event_checkin">Event Check-in</option>
+            <option value="nurture">Nurture</option>
+            <option value="conversion">Conversion</option>
+            <option value="retention">Retention</option>
+            <option value="reactivation">Reactivation</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="eventType">Event Type:</label>
+          <select id="eventType">
+            <option value="general">General</option>
+            <option value="conference">Conference</option>
+            <option value="webinar">Webinar</option>
+            <option value="workshop">Workshop</option>
+            <option value="networking">Networking</option>
+            <option value="trade_show">Trade Show</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="defaultUrl">Default Redirect URL:</label>
+          <input type="url" id="defaultUrl" placeholder="https://example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags (comma-separated):</label>
+          <input type="text" id="tags" placeholder="event2024, summer, promo" />
+        </div>
+
+        <button type="submit" class="btn-primary">Create QR Code</button>
+      </form>
+    </section>
+
+    <!-- QR Code List -->
+    <section class="qr-list">
+      <h2>Active QR Codes</h2>
+      <div class="qr-filter">
+        <select id="filterJourney">
+          <option value="">All Journey States</option>
+          <option value="lead_capture">Lead Capture</option>
+          <option value="event_checkin">Event Check-in</option>
+          <option value="nurture">Nurture</option>
+          <option value="conversion">Conversion</option>
+          <option value="retention">Retention</option>
+          <option value="reactivation">Reactivation</option>
+        </select>
+        <button onclick="loadQRCodes()" class="btn-secondary">Refresh</button>
+      </div>
+      <div id="qrCodeList" class="qr-cards">
+        <p class="loading">Loading QR codes...</p>
+      </div>
+    </section>
+
+    <!-- QR Details Modal -->
+    <div id="qrModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="qrDetails"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="qr-manager.js"></script>
+</body>
+</html>
