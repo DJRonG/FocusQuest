@@ -1,0 +1,5 @@
+{
+  "name": "FocusQuest",
+  "description": "An adaptive learning and focus web application powered by a Gemini-based Weekend-Agent core. It helps users manage tasks, maintain focus with a Pomodoro timer, and get AI-powered assistance for breaking down goals.",
+  "requestFramePermissions": []
+}
