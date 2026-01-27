@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusQuest - AI-Powered Productivity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+            --text: #e5e5e5;
+            --text-dim: #888;
+            --accent: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #10b981 100%);
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .bg-glow {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(6,182,212,0.06) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-2%, 2%) rotate(1deg); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .version {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 50px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        
+        h1 span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .card:hover {
+            border-color: rgba(139,92,246,0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card h3::after {
+            content: '→';
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover h3::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 80px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 16px;
+        }
+        
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-family: 'Space Mono', monospace;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text);
+        }
+        
+        .copyright {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 48px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139,92,246,0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <span>FocusQuest</span>
+            </div>
+            <span class="version">v2.0</span>
+        </header>
+        
+        <section class="hero">
+            <div class="badge">Powered by AI</div>
+            <h1>Your Adaptive<br><span>Learning & Focus</span><br>Companion</h1>
+            <p class="subtitle">AI-assisted prioritization for knowledge workers, creatives, and leaders seeking mindful, structured productivity.</p>
+            
+            <a href="dashboard.html" class="cta-button">
+                Launch Dashboard
+                <span>→</span>
+            </a>
+        </section>
+        
+        <section class="cards">
+            <a href="dashboard.html" class="card">
+                <div class="card-icon">📊</div>
+                <h3>Analytics Dashboard</h3>
+                <p>Track your focus patterns, task completion rates, and productivity trends with interactive visualizations.</p>
+            </a>
+            
+            <a href="dashboard.html#tasks" class="card">
+                <div class="card-icon">✅</div>
+                <h3>Task Management</h3>
+                <p>Organize tasks with AI-powered prioritization, dependencies, time blocking, and smart scheduling.</p>
+            </a>
+            
+            <a href="dashboard.html#focus" class="card">
+                <div class="card-icon">🧠</div>
+                <h3>Focus Mode</h3>
+                <p>Deep work sessions with ambient sounds, focus lighting controls, and distraction-free environment.</p>
+            </a>
+        </section>
+        
+        <section class="features">
+            <div class="feature">
+                <div class="feature-icon">📋</div>
+                <span>Daily Task Capture</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <span>AI Prioritization</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <span>Weekly Reviews</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <span>Pattern Analysis</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🏠</div>
+                <span>Smart Home Integration</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📅</div>
+                <span>Calendar Sync</span>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="footer-links">
+                <a href="https://github.com/DJRonG/FocusQuest" target="_blank">GitHub</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="qr-manager.html">QR Manager</a>
+            </div>
+            <p class="copyright">© 2025 FocusQuest. MIT License.</p>
+        </footer>
+    </div>
+</body>
+</html>
