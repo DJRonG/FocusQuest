@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusQuest | AI-Powered Productivity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-glow { 
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+        @keyframes pulse-slow { 
+            0%, 100% { opacity: 0.5; } 
+            50% { opacity: 1; } 
+        }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Priority color mapping
+        const PRIORITY_COLORS = {
+            High: { bg: 'bg-red-500/20', border: 'border-red-500/50', text: 'text-red-400', dot: 'bg-red-500' },
+            Medium: { bg: 'bg-amber-500/20', border: 'border-amber-500/50', text: 'text-amber-400', dot: 'bg-amber-500' },
+            Low: { bg: 'bg-emerald-500/20', border: 'border-emerald-500/50', text: 'text-emerald-400', dot: 'bg-emerald-500' },
+        };
+
+        // Parse natural language commands
+        const parseCommand = (input) => {
+            const lower = input.toLowerCase();
+            let priority = 'Medium';
+            if (lower.includes('high') || lower.includes('urgent') || lower.includes('asap') || lower.includes('critical')) priority = 'High';
+            if (lower.includes('low') || lower.includes('whenever') || lower.includes('someday')) priority = 'Low';
+            
+            let category = 'work';
+            if (lower.includes('personal') || lower.includes('home') || lower.includes('break')) category = 'external';
+            
+            let timeBlock = undefined;
+            if (lower.includes('morning') || lower.includes('am')) timeBlock = 'morning';
+            if (lower.includes('afternoon') || lower.includes('pm')) timeBlock = 'afternoon';
+            if (lower.includes('lunch')) timeBlock = 'lunch';
+            
+            let cleanText = input
+                .replace(/\b(high|medium|low|urgent|asap|critical|priority|personal|work|morning|afternoon|lunch|add|create|new task|schedule)\b/gi, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            return { text: cleanText || input, priority, category, timeBlock };
+        };
+
+        // AI suggestion generator
+        const generateAISuggestion = () => {
+            const suggestions = [
+                "Consider breaking this into smaller steps for easier tracking.",
+                "This looks related to your Q1 goals. Great alignment!",
+                "Based on your history, this typically takes 45-60 mins.",
+                "You tend to be most productive with tasks like this in the morning.",
+                "Similar tasks have been completed faster when done back-to-back.",
+            ];
+            return suggestions[Math.floor(Math.random() * suggestions.length)];
+        };
+
+        // TaskRow Component
+        function TaskRow({ task, onCycleStatus, onStart, onDelete, isNext }) {
+            const [showActions, setShowActions] = useState(false);
+            const priorityStyle = PRIORITY_COLORS[task.priority];
+            
+            return (
+                <div 
+                    className={`group flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer ${
+                        isNext ? 'bg-gray-800 border border-gray-700' : 'bg-gray-800/30 hover:bg-gray-800/60'
+                    }`}
+                    onMouseEnter={() => setShowActions(true)}
+                    onMouseLeave={() => setShowActions(false)}
+                >
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onCycleStatus(); }}
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors text-xs ${
+                            task.status === 'Done' 
+                                ? 'bg-emerald-500 border-emerald-500 text-white' 
+                                : 'border-gray-600 hover:border-cyan-400'
+                        }`}
+                    >
+                        {task.status === 'Done' && '✓'}
+                    </button>
+                    
+                    <div className={`w-1.5 h-8 rounded-full ${priorityStyle.dot}`} />
+                    
+                    <div className="flex-1 min-w-0">
+                        <p className={`text-sm ${task.status === 'Done' ? 'text-gray-500 line-through' : 'text-white'}`}>
+                            {task.text}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            {task.timeBlock && (
+                                <span className="text-xs text-gray-500 capitalize">{task.timeBlock}</span>
+                            )}
+                            {task.category === 'external' && (
+                                <span className="text-xs text-purple-400">Personal</span>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className={`flex items-center gap-1 transition-opacity ${showActions ? 'opacity-100' : 'opacity-0'}`}>
+                        {task.status === 'To Do' && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onStart(); }}
+                                className="px-2 py-1 text-xs bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30"
+                            >
+                                Start
+                            </button>
+                        )}
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                            className="p-1 text-gray-500 hover:text-red-400 rounded"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    
+                    <span className={`px-2 py-0.5 text-xs rounded ${priorityStyle.bg} ${priorityStyle.text}`}>
+                        {task.priority}
+                    </span>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function FocusQuestApp() {
+            const [tasks, setTasks] = useState([
+                { id: 1, text: 'Review incident reports from overnight', status: 'Done', priority: 'High', category: 'work', timeBlock: 'morning' },
+                { id: 2, text: 'Prepare B2B transformation deck', status: 'In Progress', priority: 'High', category: 'work', startTime: new Date(Date.now() - 1800000).toISOString() },
+                { id: 3, text: 'Team standup call', status: 'To Do', priority: 'Medium', category: 'work', timeBlock: 'morning' },
+                { id: 4, text: 'Deep work: API integration docs', status: 'To Do', priority: 'High', category: 'work', timeBlock: 'afternoon' },
+                { id: 5, text: 'Review escalation protocols', status: 'To Do', priority: 'Medium', category: 'work' },
+                { id: 6, text: 'Personal: Schedule gym session', status: 'To Do', priority: 'Low', category: 'external' },
+            ]);
+            
+            const [commandInput, setCommandInput] = useState('');
+            const [aiSuggestion, setAiSuggestion] = useState('');
+            const [showPowerFeatures, setShowPowerFeatures] = useState(false);
+            const [focusMode, setFocusMode] = useState(false);
+            const [ambientSound, setAmbientSound] = useState('none');
+            const [filter, setFilter] = useState('All');
+            const commandRef = useRef(null);
+
+            useEffect(() => {
+                commandRef.current?.focus();
+            }, []);
+
+            useEffect(() => {
+                if (commandInput.length > 3) {
+                    const parsed = parseCommand(commandInput);
+                    setAiSuggestion(`Will add as ${parsed.priority} priority ${parsed.category} task${parsed.timeBlock ? ` for ${parsed.timeBlock}` : ''}`);
+                } else {
+                    setAiSuggestion('');
+                }
+            }, [commandInput]);
+
+            const addTask = (text, priority = 'Medium', category = 'work', timeBlock) => {
+                const newTask = {
+                    id: Date.now(),
+                    text,
+                    status: 'To Do',
+                    priority,
+                    category,
+                    timeBlock,
+                    createdAt: new Date().toISOString(),
+                };
+                setTasks(prev => [newTask, ...prev]);
+            };
+
+            const handleCommand = (e) => {
+                e.preventDefault();
+                if (!commandInput.trim()) return;
+                
+                const parsed = parseCommand(commandInput);
+                addTask(parsed.text, parsed.priority, parsed.category, parsed.timeBlock);
+                setCommandInput('');
+                setAiSuggestion('');
+            };
+
+            const updateTaskStatus = (id, newStatus) => {
+                setTasks(prev => prev.map(task => {
+                    if (task.id === id) {
+                        const updates = { status: newStatus };
+                        if (newStatus === 'In Progress' && !task.startTime) {
+                            updates.startTime = new Date().toISOString();
+                        }
+                        if (newStatus === 'Done') {
+                            updates.completedAt = new Date().toISOString();
+                        }
+                        return { ...task, ...updates };
+                    }
+                    return task;
+                }));
+            };
+
+            const deleteTask = (id) => {
+                setTasks(prev => prev.filter(t => t.id !== id));
+            };
+
+            const cycleStatus = (task) => {
+                const order = ['To Do', 'In Progress', 'Done'];
+                const currentIdx = order.indexOf(task.status);
+                const nextIdx = (currentIdx + 1) % order.length;
+                updateTaskStatus(task.id, order[nextIdx]);
+            };
+
+            // Filtered views
+            const inProgressTasks = tasks.filter(t => t.status === 'In Progress');
+            const todoTasks = tasks.filter(t => t.status === 'To Do');
+            const doneTasks = tasks.filter(t => t.status === 'Done');
+            const highPriorityCount = todoTasks.filter(t => t.priority === 'High').length;
+            
+            // Apply filter
+            const filteredTodoTasks = todoTasks.filter(t => {
+                if (filter === 'All') return true;
+                if (filter === 'Work') return t.category === 'work';
+                if (filter === 'Personal') return t.category === 'external';
+                return true;
+            });
+
+            const currentFocus = inProgressTasks[0];
+
+            return (
+                <div className={`min-h-screen transition-colors duration-500 ${focusMode ? 'bg-gray-950' : 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800'}`}>
+                    <div className="fixed inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+                    
+                    <div className="relative max-w-4xl mx-auto px-4 py-6">
+                        
+                        {/* HEADER */}
+                        <header className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-xl">
+                                    🎯
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold text-white">FocusQuest</h1>
+                                    <p className="text-xs text-gray-500">
+                                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setFocusMode(!focusMode)}
+                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                        focusMode 
+                                            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' 
+                                            : 'bg-gray-800 text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    {focusMode ? '🔒 Focus On' : '○ Focus Mode'}
+                                </button>
+                                
+                                <select
+                                    value={ambientSound}
+                                    onChange={(e) => setAmbientSound(e.target.value)}
+                                    className="bg-gray-800 text-gray-400 text-sm rounded-lg px-3 py-1.5 border-0 outline-none focus:ring-1 focus:ring-cyan-500"
+                                >
+                                    <option value="none">🔇 Silent</option>
+                                    <option value="rain">🌧 Rain</option>
+                                    <option value="cafe">☕ Café</option>
+                                    <option value="focus">🎯 Deep Focus</option>
+                                </select>
+                            </div>
+                        </header>
+
+                        {/* AI COMMAND BAR */}
+                        <form onSubmit={handleCommand} className="mb-8">
+                            <div className="relative group">
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity blur" />
+                                <div className="relative bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-700/50">
+                                    <div className="flex items-center px-4 py-3">
+                                        <span className="text-cyan-400 mr-3 text-lg">⚡</span>
+                                        <input
+                                            ref={commandRef}
+                                            type="text"
+                                            value={commandInput}
+                                            onChange={(e) => setCommandInput(e.target.value)}
+                                            placeholder="Type to add task... (e.g., 'Review docs high priority morning')"
+                                            className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-lg"
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="ml-3 px-4 py-1.5 bg-cyan-500/20 text-cyan-400 rounded-lg text-sm font-medium hover:bg-cyan-500/30 transition-colors"
+                                        >
+                                            Add ↵
+                                        </button>
+                                    </div>
+                                    {aiSuggestion && (
+                                        <div className="px-4 py-2 border-t border-gray-700/50 text-sm text-gray-400 flex items-center gap-2">
+                                            <span className="text-purple-400">✨ AI:</span>
+                                            {aiSuggestion}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <p className="mt-2 text-xs text-gray-600 text-center">
+                                Natural language: "urgent", "high/low priority", "morning/afternoon", "personal"
+                            </p>
+                        </form>
+
+                        {/* STATS BAR */}
+                        <div className="grid grid-cols-4 gap-3 mb-8">
+                            {[
+                                { label: 'In Progress', value: inProgressTasks.length, color: 'text-cyan-400', icon: '◐' },
+                                { label: 'To Do', value: todoTasks.length, color: 'text-gray-400', icon: '○' },
+                                { label: 'High Priority', value: highPriorityCount, color: 'text-red-400', icon: '!' },
+                                { label: 'Done Today', value: doneTasks.length, color: 'text-emerald-400', icon: '●' },
+                            ].map((stat, i) => (
+                                <div key={i} className="bg-gray-800/50 rounded-xl p-3 border border-gray-700/30">
+                                    <div className="flex items-center justify-between">
+                                        <span className={`text-2xl font-bold ${stat.color}`}>{stat.value}</span>
+                                        <span className={`text-lg ${stat.color}`}>{stat.icon}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* CURRENT FOCUS */}
+                        {currentFocus && (
+                            <div className="mb-8">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-cyan-400">◉</span>
+                                    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Current Focus</h2>
+                                </div>
+                                <div className="relative group">
+                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl opacity-30 blur" />
+                                    <div className="relative bg-gray-800 rounded-2xl p-5 border border-cyan-500/30">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <h3 className="text-xl font-semibold text-white mb-2">{currentFocus.text}</h3>
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <span className={`px-2 py-0.5 rounded ${PRIORITY_COLORS[currentFocus.priority].bg} ${PRIORITY_COLORS[currentFocus.priority].text}`}>
+                                                        {currentFocus.priority}
+                                                    </span>
+                                                    {currentFocus.startTime && (
+                                                        <span className="text-gray-500">
+                                                            Started {Math.floor((Date.now() - new Date(currentFocus.startTime).getTime()) / 60000)} min ago
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="mt-3 px-3 py-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                                                    <p className="text-sm text-purple-300">
+                                                        <span className="text-purple-400">✨</span> {generateAISuggestion()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => updateTaskStatus(currentFocus.id, 'Done')}
+                                                className="ml-4 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-xl font-medium hover:bg-emerald-500/30 transition-colors flex items-center gap-2"
+                                            >
+                                                <span>✓</span> Done
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* TASK QUEUE */}
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-400">○</span>
+                                    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Up Next</h2>
+                                </div>
+                                <div className="flex gap-2">
+                                    {['All', 'Work', 'Personal'].map((f) => (
+                                        <button
+                                            key={f}
+                                            onClick={() => setFilter(f)}
+                                            className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                                                filter === f 
+                                                    ? 'bg-cyan-500/20 text-cyan-400' 
+                                                    : 'bg-gray-800 text-gray-400 hover:text-white'
+                                            }`}
+                                        >
+                                            {f}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                {filteredTodoTasks.slice(0, 6).map((task, idx) => (
+                                    <TaskRow 
+                                        key={task.id} 
+                                        task={task} 
+                                        onCycleStatus={() => cycleStatus(task)}
+                                        onStart={() => updateTaskStatus(task.id, 'In Progress')}
+                                        onDelete={() => deleteTask(task.id)}
+                                        isNext={idx === 0 && !currentFocus}
+                                    />
+                                ))}
+                                {filteredTodoTasks.length === 0 && (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <p className="text-4xl mb-2">🎉</p>
+                                        <p>All clear! Add a task above to get started.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* COMPLETED TODAY */}
+                        {doneTasks.length > 0 && (
+                            <div className="mb-8">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-emerald-400">●</span>
+                                    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                                        Completed ({doneTasks.length})
+                                    </h2>
+                                </div>
+                                <div className="space-y-1 opacity-60">
+                                    {doneTasks.slice(0, 3).map(task => (
+                                        <div key={task.id} className="flex items-center gap-3 py-2 px-3 rounded-lg bg-gray-800/30">
+                                            <span className="text-emerald-400">✓</span>
+                                            <span className="text-gray-400 line-through">{task.text}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* POWER FEATURES */}
+                        <div className="border-t border-gray-800 pt-6">
+                            <button
+                                onClick={() => setShowPowerFeatures(!showPowerFeatures)}
+                                className="flex items-center gap-2 text-gray-500 hover:text-gray-300 transition-colors text-sm"
+                            >
+                                <span className={`transition-transform ${showPowerFeatures ? 'rotate-90' : ''}`}>▶</span>
+                                Advanced Features
+                            </button>
+                            
+                            {showPowerFeatures && (
+                                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {[
+                                        { icon: '📅', label: 'Calendar', desc: 'Sync with Google/Outlook' },
+                                        { icon: '🏠', label: 'Environment', desc: 'Lighting & sounds' },
+                                        { icon: '🔍', label: 'Research', desc: 'AI-powered web search' },
+                                        { icon: '📊', label: 'Analytics', desc: 'Productivity insights' },
+                                        { icon: '🎯', label: 'Quests', desc: 'Long-term goals' },
+                                        { icon: '📰', label: 'News Feed', desc: 'Industry updates' },
+                                    ].map((feature, i) => (
+                                        <button
+                                            key={i}
+                                            className="p-4 bg-gray-800/50 rounded-xl border border-gray-700/30 text-left hover:border-gray-600/50 transition-colors"
+                                        >
+                                            <span className="text-2xl mb-2 block">{feature.icon}</span>
+                                            <p className="text-white font-medium text-sm">{feature.label}</p>
+                                            <p className="text-gray-500 text-xs">{feature.desc}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Footer */}
+                        <footer className="mt-12 pt-6 border-t border-gray-800 text-center text-xs text-gray-600">
+                            <p>FocusQuest v2 · AI-Powered Productivity for B2B Transformation</p>
+                        </footer>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FocusQuestApp />);
+    </script>
+</body>
+</html>
