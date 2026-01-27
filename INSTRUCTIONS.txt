@@ -1,0 +1,41 @@
+# FocusQuest Static Site Update
+
+## IMPORTANT: Files to DELETE from your GitHub repo
+
+Before uploading these files, **DELETE these files** from your GitHub repo:
+- `package.json`
+- `tsconfig.json` 
+- `vite.config.ts` (or `vite_config.ts`)
+- `App.tsx`
+- `index.tsx`
+- `types.ts`
+- `metadata.json`
+
+These files tell Vercel to run a React build, which causes the black screen.
+
+## Files to UPLOAD/REPLACE
+
+1. **index.html** - Replace your current index.html with this one
+2. **vercel.json** - Replace your current vercel.json with this one
+
+## Keep your existing files
+
+Keep these files in your repo:
+- dashboard.html
+- dashboard.css
+- dashboard.js
+- qr-manager.html
+- qr-manager.css
+- qr-manager.js
+- style.css
+- script.js
+- README.md
+- .gitignore
+- backend/ folder
+- docs/ folder
+
+## After uploading
+
+1. Commit and push to GitHub
+2. Vercel will auto-redeploy
+3. Your site should show the landing page with links to Dashboard and QR Manager
